@@ -12,7 +12,7 @@ import math
 import time
 import copy
 
-from fractions import gcd
+from math import gcd
 import secrets
 import sympy
 from sympy.ntheory import jacobi_symbol

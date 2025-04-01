@@ -1,3 +1,7 @@
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
+
 import asyncio
 import time
 from typing import List

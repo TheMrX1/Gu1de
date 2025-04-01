@@ -58,12 +58,37 @@ class Server:
             theta=theta
         )
 
-    def aggregate_params(self, gradients_of_parties: np.ndarray) -> np.ndarray:
+    def aggregate_params(self, gradients_of_parties: List[List[np.ndarray]]) -> np.ndarray:
         """
-        Take an array of encrypted parameters of models from all partieprime_threshold)
+        Take a list of list of encrypted parameters from all parties.
         Return array of mean encrypted params.
         """
-        return np.mean(gradients_of_parties, axis=0)
+        num_parties = len(gradients_of_parties)
+        if num_parties == 0:
+            return np.array([])
+
+        # Assuming all parties have the same number of layers
+        num_layers = len(gradients_of_parties[0])
+        aggregated_params = []
+
+        for i in range(num_layers):
+            params_for_layer = [gradients_of_parties[j][i] for j in range(num_parties)]
+            # Now params_for_layer is a list of NumPy arrays (flattened parameters for layer i from all parties)
+            # We need to take the mean of these arrays. They should all have the same shape.
+            try:
+                mean_param = np.mean(np.stack(params_for_layer), axis=0)
+                aggregated_params.append(mean_param)
+                #print(f"Shape of aggregated_params[{i}]: {mean_param.shape}")
+            except ValueError as e:
+                print(f"Error while aggregating layer {i}: {e}")
+                # Print shapes for debugging
+                for p in params_for_layer:
+                    print(f"Shape of party's param for layer {i}: {p.shape}")
+                raise e
+
+        #print(f"Length of aggregated_params: {len(aggregated_params)}")
+        #print(f"Contents of aggregated_params: {aggregated_params}")
+        return np.array(aggregated_params, dtype=object)
 
     def decrypt_param(self, param: List[phe.EncryptedNumber]) -> List[float]:
         if not config.use_he:
@@ -106,7 +131,7 @@ class Party:
         self.optimizer = Adam(self.model.parameters(), lr=config.learning_rate)
 
         self.pubkey = pubkey
-        self.randomiser = dp.mechanisms.Gaussian().set_epsilon_delta(1, 1).set_sensitivity(0.1)
+        self.randomiser = dp.mechanisms.Gaussian(epsilon=1, delta=1, sensitivity=0.1)
 
     def train_one_epoch(self, batch) -> List[EncryptedParameter]:
         """
@@ -206,4 +231,3 @@ class Party:
             for model_param, new_param in zip(self.model.parameters(), new_params):
                 # Reshape new param and assign into model
                 model_param.data = new_param.view_as(model_param.data).to(config.device)
-

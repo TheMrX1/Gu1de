@@ -16,7 +16,8 @@ class Config:
     learning_rate: float = 0.03
     hidden_size: int = 32
     test_every: int = 5
-    device: torch.device = torch.device('cuda')
+    # device: torch.device = torch.device('cuda')
+    device: torch.device = torch.device('cpu')
     use_dp: bool = True
     use_he: bool = True
     dataset: str = 'names'
