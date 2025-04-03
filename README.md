@@ -12,6 +12,6 @@ I've done minor changes to `decrypt` function for it to work correctly with floa
 ## How to run
 1. Install system dependencies for crypto stuff: `sudo apt install libgmp-dev libmpfr-dev libmpc-dev`.
 2. Install python dependencies: `pip install -r requirements.txt`.
-3. Run MNIST experiment `python main.py`.
-4. Run RNN experiment `python rnn_data.py`.
+3. Run experiment `python main.py`.
+
 
