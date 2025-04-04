@@ -1,5 +1,3 @@
-# PoC Hybrid Approach
-
 # English language version
 ## Project structure
 * `main.py` -- script for MNIST experiment (either Linear or CNN model)
